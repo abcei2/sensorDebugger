@@ -21,8 +21,10 @@ from serialUtils import (
 def finish():
     os.kill(os.getpid(), signal.SIGINT)
     exit()
+
 def cleanup(*args):
     exit()
+    
 signal.signal(signal.SIGINT, cleanup)
 
 def inputCommand(inputText):
@@ -45,6 +47,7 @@ def inputCommand(inputText):
         
     print('read input:', inputText, end='')
 
+#THREADS
 input_queue = queue.Queue()
 
 def nonBlockInputLoop():    
@@ -52,10 +55,10 @@ def nonBlockInputLoop():
         inputText = input_queue.get()
         inputCommand(inputText)
 
-# Start serial loop
+# Start serial thread loop
 serialReadThread = threading.Thread(target=serialReadLoop)
 serialReadThread.start()
-# Start non blocking input
+# Start non blocking input thread loop
 nonBlockInputThread = threading.Thread(target=nonBlockInputLoop)
 nonBlockInputThread.start()
 # main loop: stuff input in the queue

@@ -6,6 +6,8 @@ import json
 from json.decoder import JSONDecodeError
 import serial.tools.list_ports
 
+from saveData import addData
+
 sensorSerials = []
 AVAILABLE_DEVICES = ["/dev/ttyUSB0","/dev/ttyUSB1","/dev/ttyUSB2","COM3","COM4","COM5","COM6"]
 
@@ -55,6 +57,7 @@ def serialReadLoop():
                 data = sensorSerial.readline()
                 if data != b'':
                     data  = json.loads(data)
+                    addData(data)
                     print(data)
                     print("-----------------------")
             except JSONDecodeError:
