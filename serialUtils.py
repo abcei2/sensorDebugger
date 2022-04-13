@@ -57,7 +57,8 @@ def serialReadLoop():
                 data = sensorSerial.readline()
                 if data != b'':
                     data  = json.loads(data)
-                    addData(data)
+                    if 'WHOAMI' in data.keys() and 'TASK' in data.keys():
+                        addData(data)
                     print(data)
                     print("-----------------------")
             except JSONDecodeError:
