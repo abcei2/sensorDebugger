@@ -19,24 +19,12 @@ from serialUtils import (
 )
 
 def finish():
-    print('goodbye')
-    # stop main thread (which is probably blocked reading
-    # input) via an interrupt signal
-    # only available for windows in version 3.2 or higher
     os.kill(os.getpid(), signal.SIGINT)
     exit()
-
-# things to be done before exiting the main thread should go
-# in here
 def cleanup(*args):
     exit()
-
-# handle sigint, which is being used by the work thread to
-# tell the main thread to exit
 signal.signal(signal.SIGINT, cleanup)
 
-# will hold all input read, until the work thread has chance
-# to deal with it
 def inputCommand(inputText):
     try:
         commands = json.loads(inputText)        
