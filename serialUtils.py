@@ -61,7 +61,7 @@ def serialReadLoop():
                     print(data)
                     print("-----------------------")
             except JSONDecodeError:
-                print("[ERROR] Formato de json erroneo.")
+                print("[ERROR] Formato de json erroneo.",data)
                 pass                
             except SerialException:
                 print("[ERROR] Puerto desconectado.")
