@@ -60,11 +60,12 @@ def serialReadLoop():
                 if sensorSerial.in_waiting   <= 0:
                     continue
                 try:  
+                    print(f"[INFO BYTES] ", sensorSerial.in_waiting)
                     data = sensorSerial.readline()       
                     data  = json.loads(data)
+                    print(f"[SERIAL {sensorSerial.port}] ", data)
                     if 'WHOAMI' in data.keys() and 'TASK' in data.keys():
                         addData(data)
-                    print(f"[SERIAL {sensorSerial.port}] ", data)
                     print("-----------------------")
                 except JSONDecodeError:
                     print(f"[ERROR {sensorSerial.port}] Formato de json erroneo.",data)
