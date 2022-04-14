@@ -54,6 +54,7 @@ def serialReadLoop():
         autoAddSensorSerials()
         for sensorSerial in sensorSerials:   
             print(f"------{sensorSerial.port}---------")   
+            data = ""
             while data != b'':
                 try:     
                     data = sensorSerial.readline()
