@@ -55,7 +55,10 @@ def serialReadLoop():
         autoAddSensorSerials()
         for sensorSerial in sensorSerials:   
             data = ""
-            while sensorSerial.in_waiting>0:                
+            while sensorSerial.in_waiting>0:   
+                if sensorSerial.in_waiting>4000:
+                    sensorSerial.reset_input_buffer()    
+                    continue
                 try:  
                     print(f"[INFO BYTES] ", sensorSerial.in_waiting)
                     data = sensorSerial.readline()       
