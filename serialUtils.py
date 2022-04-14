@@ -27,7 +27,7 @@ def addSensorSerial(port):
     created = False
     if not exists:    
         try:
-            sensorSerial = serial.Serial(port=port, baudrate=9600, timeout=.1)          
+            sensorSerial = serial.Serial(port=port, timeout=.1)          
             sensorSerials.append(sensorSerial)
             created = True
             print("[INFO] Connected to port: ",port)
@@ -52,21 +52,22 @@ def sendCommand(command):
 def serialReadLoop():    
     while True:
         autoAddSensorSerials()
-        for sensorSerial in sensorSerials:
-            try:
-                data = sensorSerial.readline()
-                if data != b'':
+        for sensorSerial in sensorSerials:   
+            print(f"------{sensorSerial.port}---------")   
+            while data != b'':
+                try:     
+                    data = sensorSerial.readline()
                     data  = json.loads(data)
                     if 'WHOAMI' in data.keys() and 'TASK' in data.keys():
                         addData(data)
-                    print(data)
-                    print("-----------------------")
-            except JSONDecodeError:
-                print("[ERROR] Formato de json erroneo.",data)
-                pass                
-            except SerialException:
-                print("[ERROR] Puerto desconectado.")
-                sensorSerial.close()
-                sensorSerials.remove(sensorSerial)
+                    print("[SERIAL] ", data)
+                except JSONDecodeError:
+                    print("[ERROR] Formato de json erroneo.",data)
+                    pass                
+                except SerialException:
+                    print("[ERROR] Puerto desconectado.")
+                    sensorSerial.close()
+                    sensorSerials.remove(sensorSerial)
+            print("-----------------------")
                        
         time.sleep(0.1)
