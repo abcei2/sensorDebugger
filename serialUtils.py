@@ -57,7 +57,7 @@ def serialReadLoop():
             data = ""
             while True:
                 
-                if sensorSerial.in_waiting   < 0:
+                if sensorSerial.in_waiting   <= 0:
                     continue
                 try:  
                     data = sensorSerial.readline()
