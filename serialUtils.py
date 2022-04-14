@@ -28,7 +28,7 @@ def addSensorSerial(port):
     if not exists:    
         try:
             sensorSerial = serial.Serial(port=port, timeout=.1)  
-            sensorSerial.flushInput()        
+            sensorSerial.reset_input_buffer()      
             sensorSerials.append(sensorSerial)
             created = True
             print("[INFO] Connected to port: ",port)
@@ -56,11 +56,14 @@ def serialReadLoop():
         for sensorSerial in sensorSerials:   
             data = ""
             while True:
-                try:     
+                
+                if sensorSerial.in_waiting   < 0:
+                    continue
+                try:  
                     data = sensorSerial.readline()
                     if data == b'':
                         break                    
-                    print(f"------{sensorSerial.port}---------")   
+                    print(f"------{sensorSerial.port} {sensorSerial.in_waiting}---------")   
                     data  = json.loads(data)
                     if 'WHOAMI' in data.keys() and 'TASK' in data.keys():
                         addData(data)
