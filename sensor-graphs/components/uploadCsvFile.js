@@ -22,16 +22,13 @@ ChartJS.register(
     Legend
 )
 
-const datasetFormat = {
-    "LABELS":["DESIRED", "VALUE", "TEMP"],
-    "BORDERCOLOR":['rgb(255, 99, 132)','rgb(100, 255, 132)','rgb(10, 99, 255)'],
-}
-const colorClumns = ["DESIRED", "VALUE", "TEMP"]
+const numericColumns = ["DESIRED", "VALUE", "TEMP"]
+
 const fileTypes = ["CSV"];
 
 function randomRgba() {
     var o = Math.round, r = Math.random, s = 255;
-    return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',' + r().toFixed(1) + ')';
+    return 'rgba(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ',' + r().toFixed(1) + ')';
 }
 
 const csvToJson = (csvFile) => {
@@ -44,7 +41,7 @@ const csvToJson = (csvFile) => {
     array.map(item => {
         let values = item.split(",")
         values.map((value, index) => {
-            if (datasetFormat["LABELS"].includes(headers[index])) {
+            if (numericColumns.includes(headers[index])) {
                 if (!isNaN(parseFloat(value))) {
                     result[headers[index]].push(parseFloat(value))
                 }
@@ -52,6 +49,8 @@ const csvToJson = (csvFile) => {
             }
             else if (headers[index] === "TIMESTAMP")
                 result[headers[index]].push(new Date(value).toLocaleString())
+            else if (headers[index] === "GOING")
+                result[headers[index]].push(value === "UP" ? 1 : 0)
         })
     })
 
@@ -78,14 +77,14 @@ const UploadCSVFile = () => {
 
             read.onloadend = function () {
                 const csvData = csvToJson(read.result)
-                const datasets=[]
-                for(let key in csvData){
-                    if(key !=="TIMESTAMP")
-                        datasets.push( {
-                                label: key,
-                                data: csvData[key],
-                                borderColor: randomRgba()
-                            })
+                const datasets = []
+                for (let key in csvData) {
+                    if (key !== "TIMESTAMP")
+                        datasets.push({
+                            label: key,
+                            data: csvData[key],
+                            borderColor: randomRgba()
+                        })
                 }
                 const data = {
                     labels: csvData["TIMESTAMP"],
@@ -112,9 +111,9 @@ const UploadCSVFile = () => {
     }
     const chartLine = () => {
         return <div style={{
-            position:"relative",
+            position: "relative",
             textAlign: "center",
-        }}>            
+        }}>
             <Line type="line" data={chartData} options={options} />
         </div>
     }
@@ -124,7 +123,7 @@ const UploadCSVFile = () => {
             justifyContent: "center",
             alignItems: "center",
             textAlign: "center",
-            minHeight: !file?"100vh":""
+            minHeight: !file ? "100vh" : ""
         }}>
             <FileUploader handleChange={handleChange} name="file" types={fileTypes} />
         </div>
@@ -132,9 +131,9 @@ const UploadCSVFile = () => {
     }
     return (
         <div >
-{dragAndDropHere()}
+            {dragAndDropHere()}
             {file && chartLine()}
-          
+
 
 
         </div>
