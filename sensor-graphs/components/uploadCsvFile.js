@@ -35,7 +35,7 @@ function randomRgba() {
 }
 
 const csvToJson = (csvFile) => {
-    var array = csvFile.toString().split("\r\n");
+    var array = csvFile.toString().split("\n");
     let headers = array.splice(0, 1)[0].split(",");
     let result = {};
     headers.map(header => {
@@ -54,8 +54,6 @@ const csvToJson = (csvFile) => {
                 result[headers[index]].push(new Date(value).toLocaleString())
         })
     })
-
-    console.log(result)
 
     return result
 }
@@ -80,7 +78,6 @@ const UploadCSVFile = () => {
 
             read.onloadend = function () {
                 const csvData = csvToJson(read.result)
-                
                 const datasets=[]
                 for(let key in csvData){
                     if(key !=="TIMESTAMP")
@@ -103,7 +100,6 @@ const UploadCSVFile = () => {
                     })),
                 })
             }
-            console.log(file)
         }
     }, [file])
 
