@@ -11,25 +11,25 @@ data = {
         "PATH":f"./{prefix}/ECDATA/",
         "COUNTER":0, 
         "NAME":"ECREAD",
-        "DATA":{"VALUE":[],"DESIRED":[],"TIMESTAMP":[],"TEMP":[]} 
+        "DATA":{"WHOAMI":[],"VALUE":[],"DESIRED":[],"TEMP":[],"TIMESTAMP":[]} 
     },
     "ECCONTROL": {
         "PATH":f"./{prefix}/ECCONTROL/",
         "COUNTER":0,
         "NAME":"ECCONTROL",
-        "DATA": {"GOING":[],"TIMESTAMP":[]}
+        "DATA": {"WHOAMI":[],"VALUE":[],"DESIRED":[],"GOING":[],"TIMESTAMP":[]}
     },
     "PHREAD" : {
         "PATH":f"./{prefix}/PHDATA/",
         "COUNTER":0, 
         "NAME":"PHREAD",
-        "DATA":{"VALUE":[],"DESIRED":[],"TIMESTAMP":[]} 
+        "DATA":{"WHOAMI":[],"VALUE":[],"DESIRED":[],"TIMESTAMP":[]} 
     } ,
     "PHCONTROL" : {
         "PATH":f"./{prefix}/PHCONTROL/",
         "COUNTER":0, 
         "NAME":"PHCONTROL",
-        "DATA": {"GOING":[],"TIMESTAMP":[]}
+        "DATA": {"WHOAMI":[],"VALUE":[],"DESIRED":[],"GOING":[],"TIMESTAMP":[]}
     }
 }
 
@@ -48,22 +48,19 @@ def addData(command):
 
 
 def appendDataToDict(sensorPathInfo, command):
+
+    sensorPathInfo["DATA"]["WHOAMI"].append(command["WHOAMI"])
+    sensorPathInfo["DATA"]["VALUE"].append(command["VALUE"])
+    sensorPathInfo["DATA"]["DESIRED"].append(command["DESIRED"])
+    sensorPathInfo["DATA"]["TIMESTAMP"].append(datetime.datetime.now())
     if command["TASK"]=="CONTROL":
         sensorPathInfo["DATA"]["GOING"].append(command["GOING"])
-        sensorPathInfo["DATA"]["TIMESTAMP"].append(datetime.datetime.now())
-        if len(sensorPathInfo["DATA"]["GOING"]) >= MAX_NUM_ROWS_FOR_DATAFRAME:
-            dataToCsv(sensorPathInfo)
-            clearData(sensorPathInfo["DATA"])
-
     elif command["TASK"]=="READ":
-        sensorPathInfo["DATA"]["VALUE"].append(command["VALUE"])
-        sensorPathInfo["DATA"]["DESIRED"].append(command["DESIRED"])
-        sensorPathInfo["DATA"]["TIMESTAMP"].append(datetime.datetime.now())
         if command["WHOAMI"]=="EC":    
             sensorPathInfo["DATA"]["TEMP"].append(command["TEMP"])            
-        if len(sensorPathInfo["DATA"]["VALUE"]) >= MAX_NUM_ROWS_FOR_DATAFRAME:
-            dataToCsv(sensorPathInfo)
-            clearData(sensorPathInfo["DATA"])
+    if len(sensorPathInfo["DATA"]["VALUE"]) >= MAX_NUM_ROWS_FOR_DATAFRAME:
+        dataToCsv(sensorPathInfo)
+        clearData(sensorPathInfo["DATA"])
     
 def dataToCsv(sensorPathInfo):
     dataFrame = pandas.DataFrame.from_dict(sensorPathInfo["DATA"]) 
