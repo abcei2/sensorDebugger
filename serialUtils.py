@@ -28,11 +28,13 @@ def addSensorSerial(port):
     if not exists:    
         try:
             sensorSerial = serial.Serial(port=port, timeout=.1)  
+
             for baudrate in sensorSerial.BAUDRATES:
                 if 9600 <= baudrate <= 115200:
                     sensorSerial.baudrate = baudrate
                     try:
                         sensorSerial.write(bytes("packet", 'utf-8'))
+                        time.sleep(0.1)
                         resp = sensorSerial.read()
                         print(resp)
                         if resp != '':
