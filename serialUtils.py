@@ -11,10 +11,26 @@ from saveData import addData
 sensorSerials = []
 AVAILABLE_DEVICES = ["/dev/ttyUSB0","/dev/ttyUSB1","/dev/ttyUSB2","COM3","COM4","COM5","COM6"]
 
+DEVICES = [
+    {
+        "PORT":"/dev/ttyUSB0",
+        "BAUDRATE":57600,        
+    },
+    
+    {
+        "PORT":"/dev/ttyUSB1",
+        "BAUDRATE":9600,        
+    }
+]
+
 def autoAddSensorSerials():
     for p in list(serial.tools.list_ports.comports(include_links=True)):   
         if p.device in AVAILABLE_DEVICES:
-            addSensorSerial(p.device)            
+            addSensorSerial(p.device)     
+
+def manualAddSensorSerials():
+    for p in DEVICES:   
+        addSensorSerial(p["PORT"],p["BAUDRATE"])    
 
 def sensorSerialExists(port):
     for sensorSerial in sensorSerials:
@@ -22,31 +38,12 @@ def sensorSerialExists(port):
             return True, sensorSerial
     return False, None
 
-def addSensorSerial(port):
+def addSensorSerial(port, baudrate=9600):
     exists, sensorSerial = sensorSerialExists(port)
     created = False
     if not exists:    
         try:
-            sensorSerial = serial.Serial(port=port, timeout=.1)  
-
-            for baudrate in sensorSerial.BAUDRATES:
-                if 9600 <= baudrate <= 115200:
-                    sensorSerial.baudrate = baudrate
-                    try:
-                        sensorSerial.write(bytes("packet", 'utf-8'))
-                        time.sleep(0.1)
-                        resp = sensorSerial.read()
-                        print(resp)
-                        if resp != '':
-                            break
-                    except:
-                        print("not good")
-
-                   
-
-            if sensorSerial.baudrate > 115200:
-                print("Couldn't find appropriate baud rate!")
-                return created, exists, None
+            sensorSerial = serial.Serial(port=port,baudrate=baudrate, timeout=.1)  
 
             sensorSerial.reset_input_buffer()      
             sensorSerials.append(sensorSerial)
@@ -72,7 +69,7 @@ def sendCommand(command):
 # read serial of all devices each 0.1 secs
 def serialReadLoop():    
     while True:
-        autoAddSensorSerials()
+        manualAddSensorSerials()
         for sensorSerial in sensorSerials:   
             data = ""
             while sensorSerial.in_waiting>0:   
