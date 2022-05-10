@@ -31,19 +31,20 @@ def addSensorSerial(port):
             for baudrate in sensorSerial.BAUDRATES:
                 if 9600 <= baudrate <= 115200:
                     sensorSerial.baudrate = baudrate
-                    sensorSerial.write(packet)
-                    sensorSerial = sensorSerial.read()
+                    sensorSerial.write("packet")
+                    resp = sensorSerial.read()
+                    print(resp)
                     if resp != '':
                         break
 
             if sensorSerial.baudrate > 115200:
                 print("Couldn't find appropriate baud rate!")
                 return created, exists, None
-                
+
             sensorSerial.reset_input_buffer()      
             sensorSerials.append(sensorSerial)
             created = True
-            print("[INFO] Connected to port: ",port)
+            print("[INFO] Connected to port: ",port," baudrate: ",sensorSerial.baudrate)
         except SerialException:
             print("[ERROR] Can't connect to port: ",port)
     
