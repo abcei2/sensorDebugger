@@ -31,7 +31,7 @@ def addSensorSerial(port):
             for baudrate in sensorSerial.BAUDRATES:
                 if 9600 <= baudrate <= 115200:
                     sensorSerial.baudrate = baudrate
-                    sensorSerial.write("packet")
+                    sensorSerial.write(bytes("packet", 'utf-8'))
                     resp = sensorSerial.read()
                     print(resp)
                     if resp != '':
