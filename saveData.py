@@ -63,7 +63,10 @@ def clearData(data):
 
 def addData(command):
     appendDataToDict(data[command["WHOAMI"] + command["TASK"]], command)
-    syncToInflux(command)
+    try:
+        syncToInflux(command)
+    except Exception as e:
+        print("Error syncing to influx:", e)
 
 
 def appendDataToDict(sensorPathInfo, command):
