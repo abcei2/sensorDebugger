@@ -3,20 +3,20 @@
 """Treat input if available, otherwise exit without
 blocking"""
 
+import json
+import os
+import queue
+import signal
 import sys
 import threading
-import queue
-import os
-import signal
 
-import time
-import json
 from json.decoder import JSONDecodeError
 
 from serialUtils import (
-    addSensorSerial, sendCommand, 
-    sensorSerials, serialReadLoop
+    addSensorSerial, sendCommand, serialReadLoop
 )
+
+print("# Starting script...")
 
 def finish():
     os.kill(os.getpid(), signal.SIGINT)
@@ -47,7 +47,7 @@ def inputCommand(inputText):
         
     print('read input:', inputText, end='')
 
-#THREADS
+# Threads
 input_queue = queue.Queue()
 
 def nonBlockInputLoop():    
@@ -55,12 +55,13 @@ def nonBlockInputLoop():
         inputText = input_queue.get()
         inputCommand(inputText)
 
-# Start serial thread loop
+print("# Start serial thread loop")
 serialReadThread = threading.Thread(target=serialReadLoop)
 serialReadThread.start()
-# Start non blocking input thread loop
+
+print("# Start non blocking input thread loop")
 nonBlockInputThread = threading.Thread(target=nonBlockInputLoop)
 nonBlockInputThread.start()
-# main loop: stuff input in the queue
+
 for line in sys.stdin:
     input_queue.put(line)
