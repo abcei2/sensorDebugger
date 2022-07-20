@@ -5,9 +5,6 @@ import pandas
 import requests
 import time
 
-INFLUXDB_DOMAIN = "207.246.118.54"
-INFLUXDB_TOKEN = "loB9a7VkXuIY1Jjh3ScwRWg2Foq6Lb0p6kk9QHMBhjunp-KDCUdrc8TsB4YBVrHee0xmd9LYNtXN75J5v9hK8w=="
-
 MAX_NUM_ROWS_FOR_CSV = 1000
 MAX_NUM_ROWS_FOR_DATAFRAME = 10
 
@@ -104,24 +101,37 @@ def dataToCsv(sensorPathInfo):
             dataSaved = True
 
 
+def getInfluxLine(command):
+    if command["WHOAMI"] != "PH":
+        return None
+
+    if command["TASK"] == "READ":
+        return f"basil,ph_sensor_brand=atlas ph={command['VALUE']} {math.trunc(time.time())}"
+
+    if command["TASK"] == "CONTROL":
+        return f"basil,ph_sensor_brand=atlas,direction={command['GOING']} dose={command['VALUE']} {math.trunc(time.time())}"
+
+    return None
+
 def syncToInflux(command):
-    if not (command["WHOAMI"] == "PH" and command["TASK"] == "READ"):
-        # Only ph read enabled for now
+
+    line = getInfluxLine(command)
+    if line is None:
         return
 
-    pH = command["VALUE"]
-    data = f"basil,ph_sensor_brand=atlas ph={pH} {math.trunc(time.time())}"
+    INFLUXDB_DOMAIN = "207.246.118.54"
+    INFLUXDB_TOKEN = "loB9a7VkXuIY1Jjh3ScwRWg2Foq6Lb0p6kk9QHMBhjunp-KDCUdrc8TsB4YBVrHee0xmd9LYNtXN75J5v9hK8w=="
+    INFLUXDB_ORG = "Tucano%20Robotics"
+    INFLUXDB_BUCKET = "autoponico"
 
     headers = {
         "Authorization": f"Token {INFLUXDB_TOKEN}",
         "Content-Type": "text/plain; charset=utf-8",
         "Accept": "application/json",
     }
-    INFLUXDB_ORG = "Tucano%20Robotics"
-    INFLUXDB_BUCKET = "autoponico"
 
     requests.post(
         f"http://{INFLUXDB_DOMAIN}:8086/api/v2/write?org={INFLUXDB_ORG}&bucket={INFLUXDB_BUCKET}&precision=s",
-        data=data.encode(),
+        data=line.encode(),
         headers=headers,
     )
